@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+	<meta charset="utf-8" />
+	<link rel="stylesheet" href="/css/bootstrap.min.css">
+	<script src="/js/jquery-3.6.0.min.js"></script>
+	<script src="/js/popper.min.js"></script>
+	<script src="/js/bootstrap.min.js"></script>
+	<script src="/js/menu.js"></script>
+	<title>jm2業務サポート</title>
+</head>
+<body>
+	<div class="container">
+    	<h3>メニュー</h3>
+		<nav aria-label="breadcrumb">
+			<ol class="breadcrumb">
+				<li class="breadcrumb-item">Menu</li>
+			</ol>
+		</nav>
+
+		<div th:if="${responseForm.message != ''}">
+			<span th:id="id-message" th:text="${responseForm.message}"></span>
+		</div>
+
+		<form th:id="id-form-menu" th:action="@{/menu}" method="get">
+	        <table class="table table-striped">
+	            <tr>
+	                <th>データ登録</th>
+	                <td><button class="btn btn-primary" th:id="id-button-data-update" th:disable="${responseForm.dataUpdateButtonStatus}">現在値更新</button>
+	                	<button class="btn btn-primary" th:id="id-button-data-race">レースCSV読込</button></td>
+	            </tr>
+	            <tr>
+	                <th>ダッシュボード</th>
+	                <td><button class="btn btn-primary" th:id="id-button-dashboard-list">購入対象一覧表示</button>
+	                	<button class="btn btn-primary" th:id="id-button-dashboard-max" disabled>MAX値一覧表示</button></td>
+	            </tr>
+	            <tr>
+	                <th>メンテナンス</th>
+	                <td><button class="btn btn-primary" th:id="id-button-maintenance-sysconfig">システム設定</button>
+	                	<button class="btn btn-primary" th:id="id-button-maintenance-ticket">券種マスタ管理</button></td>
+	            </tr>
+	            <tr>
+	                <th>テスト</th>
+	                <td><button class="btn btn-primary" th:id="id-button-test-index">タイマーテスト</button></td>
+	            </tr>
+	        </table>
+		</form>
+    </div>
+</body>
+</html>

@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.demo.mapper.TRelationsMapper">
+
+	<resultMap id="relationsResultMap" type="com.example.demo.dto.master.TRelations">
+		<result property="raceday" column="raceday" />
+		<result property="rownum" column="rownum" />
+		<result property="isDeleted" column="is_deleted" />
+	</resultMap>
+
+	<!-- リレーションテーブルにレコードを登録する -->
+	<insert id="insertRelations" parameterType="com.example.demo.dto.master.TRelations">
+	    insert into t_relations
+	      (raceday, rownum, is_deleted)
+	    values
+	    (
+	      #{tr.raceday,jdbcType=VARCHAR},
+	      #{tr.rownum,jdbcType=VARCHAR},
+	      #{tr.isDeleted,jdbcType=VARCHAR}
+	    )
+	</insert>
+
+	<!-- リレーションテーブルのレース結果済み行番号を更新する -->
+	<update id="updateRelations" parameterType="com.example.demo.dto.master.TRelations">
+	    UPDATE
+	    	t_relations tr
+	    SET
+			tr.rownum = #{tr.rownum}
+	    WHERE
+	    	tr.raceday = #{tr.raceday}
+	</update>
+
+	<!-- リレーションテーブルから当日とレース番号を条件にレコードを取得する -->
+    <select id="selectRelationsByRacedayOfCheck"
+    		resultMap="relationsResultMap"
+    		parameterType="com.example.demo.form.dashboard.DashBoardCheckRequestForm">
+		SELECT
+			tr.raceday,
+			tr.rownum
+		FROM
+			t_relations tr
+		WHERE
+			tr.is_deleted = '0'
+			AND tr.raceday = #{req.raceday}
+		GROUP BY
+			tr.raceday, tr.rownum
+    </select>
+
+	<!-- リレーションテーブルから当日とレース番号を条件にレコードを取得する -->
+    <select id="selectRelationsByRacedayOfRegister"
+    		resultMap="relationsResultMap"
+    		parameterType="com.example.demo.form.DataViewRequestForm">
+		SELECT
+			tr.raceday,
+			tr.rownum
+		FROM
+			t_relations tr
+		<where>
+			tr.is_deleted = '0'
+			<if test="req.raceday != '' and req.raceday != null">
+				AND tr.raceday = #{req.raceday}
+			</if>
+		</where>
+		GROUP BY
+			tr.raceday, tr.rownum
+    </select>
+</mapper>

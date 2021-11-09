@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+	<meta charset="utf-8" />
+	<link rel="stylesheet" href="/css/bootstrap.min.css">
+	<link rel="stylesheet" href="/css/bootstrap-select.css">
+	<link rel="stylesheet" href="/css/data/view.css">
+	<script src="/js/jquery-3.6.0.min.js"></script>
+	<script src="/js/popper.min.js"></script>
+	<script src="/js/bootstrap.min.js"></script>
+	<script src="/js/bootstrap-select.js"></script>
+	<script src="/js/data/view.js"></script>
+	<title>データ登録</title>
+</head>
+<body>
+
+	<div class="container">
+    	<h3>現在値更新</h3>
+		<nav aria-label="breadcrumb">
+			<ol class="breadcrumb">
+				<li class="breadcrumb-item" id="id-link-menu"><a href="../menu">Menu</a></li>
+				<li class="breadcrumb-item">Data</li>
+				<li class="breadcrumb-item active" aria-current="update">update</li>
+			</ol>
+		</nav>
+
+		<div th:if="${responseForm.message != ''}">
+			<span th:id="id-message" th:text="${responseForm.message}"></span>
+		</div>
+
+		<table class="table table-striped">
+			<thead>
+				<tr>
+					<th>No</th>
+					<th>日付</th>
+					<th>曜日</th>
+					<th>会場</th>
+					<th>レース</th>
+					<th>馬場</th>
+					<th>頭数</th>
+					<th>マイル</th>
+					<th>1着</th>
+					<th>2着</th>
+					<th>3着</th>
+					<th></th>
+					<th></th>
+					<th></th>
+					<th>
+						<select class="form-select" aria-label="Default select example" th:id="id-pulldown-acd" name="name-pulldown-acd">
+							<option th:each="acd : ${responseForm.acdPullDownMap}" th:value="${acd.key}" th:selected="${acd.key == key}" th:inline="text">[[${acd.value}]]</option>
+						</select>
+					</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr th:each="race, status : ${responseForm.raceList}" th:id="'id-row' + ${status.count}" th:styleappend="${race.rowColor}">
+	                <td style="width: 9%" th:id="id-rownum" th:text="${status.count}"></td>
+					<td style="width: 7%" th:id="id-raceday" th:inline="text">[[${race.year}]][[${race.month}]][[${@race.getDayZeroPadding(race.day)}]]</td>
+					<td style="width: 6%" th:id="id-dayofweek" th:text="${@race.getDayOfWeek(race.year,race.month,race.day)}"></td>
+					<td style="width: 6%" th:id="id-place" th:text="${race.place}"></td>
+					<td style="width: 9%" th:id="id-no" th:text="${race.no}"></td>
+					<td style="width: 9%" th:text="${race.kind}"></td>
+					<td style="width: 6%" th:id="id-horse" th:text="${race.horse}"></td>
+					<td style="width: 8%" th:text="${race.distance}"></td>
+	                <td style="width: 10%"><input class="form-control henkan" type="text" th:id="'id-input-row' + ${status.count} + '-val1'" th:name="'name-input-row' + ${status.count} + '-val1'" th:readonly="${race.input1FormStatus}" th:value="${race.winner}" /></td>
+	                <td style="width: 10%"><input class="form-control henkan" type="text" th:id="'id-input-row' + ${status.count} + '-val2'" th:name="'name-input-row' + ${status.count} + '-val2'" th:readonly="${race.input2FormStatus}" th:value="${race.runnerUp}" /></td>
+	                <td style="width: 10%"><input class="form-control henkan" type="text" th:id="'id-input-row' + ${status.count} + '-val3'" th:name="'name-input-row' + ${status.count} + '-val3'" th:readonly="${race.input3FormStatus}" th:value="${race.thirdPlace}" /></td>
+	                <td style="width: 3%"><button type="button" class="btn btn-primary register-btn" th:id="'id-button-row' + ${status.count} + '-register'" th:disabled="${race.resisterButtonStatus}">→</button></td>
+					<td style="width: 3%"><button type="button" class="btn btn btn-warning fix-btn" th:id="'id-button-row' + ${status.count} + '-fix'" th:disabled="${race.fixButtonStatus}">↑</button></td>
+					<td style="width: 7%" class="cb"><input type="checkbox" class="custom-check-input react-chk" th:id="'id-checkbox-row' + ${status.count}" th:name="'name-checkbox-row' + ${status.count}" th:checked="${race.reactCheckBox}" /></td>
+					<td style="width: 7%"><input class="form-control henkan" type="text" th:id="'id-input-row' + ${status.count} + '-acd'" th:name="'name-input-row' + ${status.count} + '-acd'" th:readonly="${race.inputAcdStatus}" />
+											<input type="hidden" th:id="'id-hidden-acd' + ${status.count} + '-cd'" name="'name-hidden-acd' + ${status.count} + '-cd'" value=""  />
+											<input type="hidden" th:id="'id-hidden-acd' + ${status.count} + '-val'" name="'mame-hidden-acd' + ${status.count} + '-val'" value="" /></td>
+				</tr>
+			</tbody>
+		</table>
+		<input type="hidden" th:id="id-hidden-prog-row" th:name="progressRow" th:value="${responseForm.progressRow}" />
+    </div>
+</body>
+</html>

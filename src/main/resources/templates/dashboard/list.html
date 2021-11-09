@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+	<meta charset="utf-8" />
+	<link rel="stylesheet" href="/css/bootstrap.min.css">
+	<link rel="stylesheet" href="/css/datatables.css">
+	<link rel="stylesheet" href="/css/remodal.css">
+	<link rel="stylesheet" href="/css/remodal-default-theme.css">
+	<link rel="stylesheet" href="/css/jQuery.countdownTimer.css">
+	<link rel="stylesheet" href="/css/dashboard/list.css">
+	<script src="/js/jquery-3.6.0.min.js"></script>
+	<script src="/js/popper.min.js"></script>
+	<script src="/js/bootstrap.min.js"></script>
+	<script src="/js/datatables.js"></script>
+	<script src="/js/remodal.js"></script>
+	<script src="/js/jQuery.countdownTimer.js"></script>
+	<script src="/js/dashboard/list.js"></script>
+	<title>ダッシュボード</title>
+</head>
+<body>
+	<div class="container">
+    	<h3>購入対象一覧表示</h3>
+
+		<nav aria-label="breadcrumb">
+			<ol class="breadcrumb">
+				<li class="breadcrumb-item" id="id-link-menu"><a href="../menu">Menu</a></li>
+				<li class="breadcrumb-item">Dashboard</li>
+				<li class="breadcrumb-item active" aria-current="page">list</li>
+			</ol>
+		</nav>
+
+		<nav aria-label="breadcrumb">
+			<ol class="breadcrumb">
+				<li class="breadcrumb-item"><span id="current_timer"></span></li>
+				<li class="breadcrumb-item"><span id="display"></span></li>
+			</ol>
+		</nav>
+
+		<div th:if="${res.message != ''}">
+			<span th:id="id-message" th:text="${res.message}"></span>
+		</div>
+
+		<table class="table table-striped" th:id="id-table">
+    		<thead>
+				<tr>
+					<th>No</th>
+					<th>券種</th>
+					<th>ハマリ次</th>
+					<th>2連次</th>
+					<th>3連次</th>
+					<th>MAX値</th>
+					<th>現在値</th>
+					<th>更新日時</th>
+					<th>削除フラグ</th>
+				</tr>
+		    <thead>
+		    <tbody th:id="id-tbody">
+				<tr th:each="pti,status : ${res.purTgtInfoList}">
+					<td th:text="${status.count}"></td>
+					<td th:text="${pti.bettingTicketsName}"></td>
+					<td th:text="${pti.fitVal}"></td>
+					<td th:text="${pti.secondVal}"></td>
+					<td th:text="${pti.thirdVal}"></td>
+					<td th:text="${pti.maxVal}"></td>
+					<td th:text="${pti.limitVal}"></td>
+					<td th:text="${#dates.format(new java.util.Date(pti.updatedAt), 'yyyy-MM-dd hh:mm')}"></td>
+					<td th:text="${pti.isDeleted}"></td>
+				</tr>
+			</tbody>
+		</table>
+
+		<button id="id-popup-button">ボタン</button>
+		<p class="popup"><span th:text="${res.popupMessage}"></span></p>
+
+		<input type="hidden" th:id="input-hidden-raceday" th:value="${res.raceday}" />
+		<input type="hidden" th:id="input-hidden-prog-rownum" th:value="${res.rownum}" />
+		<input type="hidden" th:id="input-hidden-popup-message" th:value="${res.popupMessage}" />
+		<input type="hidden" th:id="input-hidden-new-purchases" th:value="${res.newPurchases}" />
+		<input type="hidden" th:id="input-hidden-confkey-timer" th:value="${res.confKeyTimerMode}" />
+    </div>
+</body>
+</html>

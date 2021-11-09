@@ -1,0 +1,18 @@
+.popup {
+    position: fixed;
+    bottom: 0px;
+    left: 0px;
+    right: 0px;
+    transform: translateY(100%);
+    padding: 1em;
+    margin: 0px;
+    background-color: #3388dd;
+    color: #fff;
+    text-align: center;
+    opacity: 0;
+    transition: 0.5s;
+}
+.popup.js_active {
+    transform: translateY(0%);
+    opacity: 1;
+}

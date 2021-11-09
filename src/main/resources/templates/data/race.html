@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+	<meta charset="utf-8" />
+	<link rel="stylesheet" href="/css/bootstrap.min.css">
+	<script src="/js/jquery-3.6.0.min.js"></script>
+	<script src="/js/popper.min.js"></script>
+	<script src="/js/bootstrap.min.js"></script>
+	<script src="/js/data/race.js"></script>
+	<title>データ登録</title>
+</head>
+<body>
+
+	<div class="container">
+    	<h3>レースCSV一覧</h3>
+		<nav aria-label="breadcrumb">
+			<ol class="breadcrumb">
+				<li class="breadcrumb-item" id="id-link-menu"><a href="../menu">Menu</a></li>
+				<li class="breadcrumb-item">Maintenance</li>
+				<li class="breadcrumb-item active" aria-current="page">race</li>
+			</ol>
+		</nav>
+
+		<div th:if="${responseForm.message != ''}">
+			<span th:id="id-message" th:text="${responseForm.message}"></span>
+		</div>
+
+		<table class="table table-striped">
+			<tr th:each="row, status : ${responseForm.csvRows}">
+				<td th:id="id-rownum" th:text="${status.count}"></td>
+				<td th:id="id-file" th:text="${row.file.getName}"></td>
+                <td><button type="button"
+                			class="btn btn-primary read-btn"
+                			th:id="'id-button-row' + ${status.count} + '-read'"
+                			th:disabled="${row.csvReadButtonStatus}">読込</button></td>
+			</tr>
+		</table>
+    </div>
+</body>
+</html>

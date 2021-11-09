@@ -1,0 +1,366 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.demo.mapper.DataMapper">
+
+	<!-- レーステーブル情報一覧を取得する -->
+	<select id="getRaceTableInfos"
+			resultType="com.example.demo.dto.Race"
+			parameterType="com.example.demo.form.DataViewDisplayRequestForm">
+		SELECT
+			tr.id AS id,
+			tr.year AS year,
+			tr.month AS month,
+			tr.day AS day,
+			tr.place AS place,
+			tr.no AS no,
+			tr.grade AS grade,
+			tr.conditions AS conditions,
+			tr.kind AS kind,
+			tr.distance AS distance,
+			tr.horse AS horse,
+			tr.created_at AS createdAt,
+			tr.updated_at AS updatedAt,
+			tr.is_deleted AS isDeleted,
+			trr.winner AS winner,
+			trr.runner_up AS runnerUp,
+			trr.third_place AS thirdPlace,
+			trr.accident_code AS accidentCode,
+			trr.accident_value AS accidentValue
+		FROM
+			t_races tr
+			LEFT JOIN t_race_results trr
+				ON tr.year = trr.year
+				AND tr.month = trr.month
+				AND tr.day = trr.day
+				AND tr.no = trr.racenum
+				AND tr.place = trr.place
+		WHERE
+			tr.month =  #{form.month}
+			AND tr.day =  #{form.day}
+			AND tr.is_deleted = '0'
+    </select>
+
+    <!-- レース結果テーブル情報一覧を取得する -->
+	<select id="selectRaceResultsInfos"
+			resultType="com.example.demo.dto.master.TRaceResults"
+			parameterType="com.example.demo.form.DataViewFixRequestForm">
+		SELECT
+			trr.id AS id,
+			trr.rownum AS rownum,
+			trr.raceday AS raceday,
+			trr.year AS year,
+			trr.month AS month,
+			trr.day AS day,
+			trr.racenum AS racenum,
+			trr.winner AS winner,
+			trr.runner_up AS runnerUp,
+			trr.third_place AS thirdPlace,
+			trr.accident_code AS accidentCode,
+			trr.accident_value AS accidentValue,
+			trr.created_at AS createdAt,
+			trr.updated_at AS updatedAt,
+			trr.is_deleted AS isDeleted
+		FROM
+			t_race_results trr
+		WHERE
+			trr.raceday =  #{raceday}
+			AND trr.is_deleted = '0'
+    </select>
+
+    <!-- 日付を条件にレース結果テーブルの行数をカウントする -->
+	<select id="countRaceResultRow"
+			resultType="Integer"
+			parameterType="com.example.demo.form.DataViewDisplayRequestForm">
+		SELECT
+			COUNT(*)
+		FROM
+			t_race_results trr
+		WHERE
+			trr.month =  #{form.month}
+			AND trr.day =  #{form.day}
+			AND trr.is_deleted = '0'
+    </select>
+
+	<!-- レース結果テーブルにレコードを挿入する -->
+	<insert id="insertRaceResults"
+			parameterType="com.example.demo.dto.master.TRaceResults"
+			useGeneratedKeys="true"
+			keyProperty="id">
+	    insert into t_race_results
+	      (rownum, raceday, year, month, day, racenum, place, winner, runner_up, third_place, accident_code, accident_value)
+	    values
+	    (
+	      #{trr.rownum,jdbcType=VARCHAR},
+	      #{trr.raceday,jdbcType=VARCHAR},
+	      #{trr.year,jdbcType=VARCHAR},
+	      #{trr.month,jdbcType=VARCHAR},
+	      #{trr.day,jdbcType=VARCHAR},
+	      #{trr.racenum,jdbcType=VARCHAR},
+	      #{trr.place,jdbcType=VARCHAR},
+	      #{trr.winner,jdbcType=VARCHAR},
+	      #{trr.runnerUp,jdbcType=VARCHAR},
+	      #{trr.thirdPlace,jdbcType=VARCHAR},
+	      #{trr.accidentCode,jdbcType=VARCHAR},
+	      #{trr.accidentValue,jdbcType=VARCHAR}
+	    )
+	</insert>
+
+	<!-- レース結果テーブルのレコードを削除フラグを立てて更新する -->
+	<update id="updateRaceResults"
+			parameterType="com.example.demo.dto.master.TRaceResults">
+	    UPDATE
+	    	t_race_results trr
+	    SET
+			trr.is_deleted = #{trr.isDeleted}
+	    WHERE
+	    	trr.id = #{trr.id}
+	</update>
+
+	<!-- 主キーを条件として発送順テーブル情報を取得する -->
+    <select	id="selectShippingOrderByPrimaryKey"
+	    	resultType="com.example.demo.dto.TShippingOrder"
+	    	parameterType="Integer">
+	    SELECT
+			tso.id AS id,
+			tso.betting_tickets_code AS bettingTicketsCode,
+			tso.odds AS odds,
+			tso.time_chase AS timeChase,
+			tso.time_chase_sub AS timeChaseSub,
+			tso.present_value AS presentValue,
+			tso.continuous_injustice_max AS continuousInjusticeMax,
+			tso.continuous_injustice_count AS continuousInjusticeCount,
+			tso.created_at AS createdAt,
+			tso.updated_at AS updatedAt,
+			tso.is_deleted AS isDeleted
+		FROM
+			t_shipping_order tso
+		WHERE
+			tso.id = #{id}
+			AND tso.is_deleted = '0'
+    </select>
+
+	<!-- 発送順テーブル情報を取得する -->
+    <select	id="selectShippingOrder"
+	    	resultType="com.example.demo.dto.TShippingOrder"
+	    	parameterType="string">
+	    SELECT
+			tso.id AS id,
+			tso.betting_tickets_code AS bettingTicketsCode,
+			tso.odds AS odds,
+			tso.time_chase AS timeChase,
+			tso.time_chase_sub AS timeChaseSub,
+			tso.present_value AS presentValue,
+			tso.continuous_injustice_max AS continuousInjusticeMax,
+			tso.continuous_injustice_count AS continuousInjusticeCount,
+			tso.created_at AS createdAt,
+			tso.updated_at AS updatedAt,
+			tso.is_deleted AS isDeleted
+		FROM
+			t_shipping_order tso
+		WHERE
+			tso.betting_tickets_code = #{bettingTicketsCode}
+			AND tso.is_deleted = '0'
+    </select>
+
+	<!-- 単勝の選外である発送順テーブル情報一覧を取得する -->
+    <select	id="selectShippingOrderOfNotSelectedAtWin"
+	    	resultType="com.example.demo.dto.TShippingOrder"
+	    	parameterType="string">
+	<![CDATA[
+	    SELECT
+			f1.id AS id,
+			f1.betting_tickets_code AS bettingTicketsCode,
+			f1.odds AS odds,
+			f1.time_chase AS timeChase,
+			f1.time_chase_sub AS timeChaseSub,
+			f1.present_value AS presentValue,
+			f1.continuous_injustice_max AS continuousInjusticeMax,
+			f1.continuous_injustice_count AS continuousInjusticeCount,
+			f1.created_at AS createdAt,
+			f1.updated_at AS updatedAt,
+			f1.is_deleted AS isDeleted
+		FROM
+			(SELECT *
+			FROM t_shipping_order tso
+			WHERE tso.betting_tickets_code LIKE '100000%' AND tso.is_deleted = '0') f1
+		WHERE
+			f1.betting_tickets_code != #{bettingTicketsCode}
+			AND f1.is_deleted = '0'
+	]]>
+    </select>
+
+	<!-- 単勝をリスト化して選外である発送順テーブル情報一覧を取得する -->
+    <select	id="selectShippingOrdersOfNotSelectedAtWin"
+			resultType="com.example.demo.dto.TShippingOrder"
+			parameterType="java.util.List">
+	<![CDATA[
+	    SELECT
+			f1.id AS id,
+			f1.betting_tickets_code AS bettingTicketsCode,
+			f1.odds AS odds,
+			f1.time_chase AS timeChase,
+			f1.time_chase_sub AS timeChaseSub,
+			f1.present_value AS presentValue,
+			f1.continuous_injustice_max AS continuousInjusticeMax,
+			f1.continuous_injustice_count AS continuousInjusticeCount,
+			f1.created_at AS createdAt,
+			f1.updated_at AS updatedAt,
+			f1.is_deleted AS isDeleted
+		FROM
+			(SELECT *
+			FROM t_shipping_order tso
+			WHERE tso.betting_tickets_code LIKE '100000%' AND tso.is_deleted = '0') f1
+		WHERE
+			f1.is_deleted = '0'
+			AND f1.betting_tickets_code NOT IN
+			<foreach collection="codeList" item="c" open="(" separator="," close=")">
+				 #{c.code}
+			</foreach>
+	]]>
+    </select>
+
+	<!--複勝の当選リストから選外である発送順テーブル情報一覧を取得する -->
+	<select id="selectShippingOrdersOfNotSelectedAtShow"
+			resultType="com.example.demo.dto.TShippingOrder"
+			parameterType="java.util.List">
+		SELECT
+			f1.id AS id,
+			f1.betting_tickets_code AS bettingTicketsCode,
+			f1.odds AS odds,
+			f1.time_chase AS timeChase,
+			f1.time_chase_sub AS timeChaseSub,
+			f1.present_value AS presentValue,
+			f1.continuous_injustice_max AS continuousInjusticeMax,
+			f1.continuous_injustice_count AS continuousInjusticeCount,
+			f1.created_at AS createdAt,
+			f1.updated_at AS updatedAt,
+			f1.is_deleted AS isDeleted
+		FROM
+			(SELECT *
+				FROM t_shipping_order tso
+				WHERE tso.betting_tickets_code LIKE '200000%' AND tso.is_deleted = '0') f1
+		WHERE
+			f1.is_deleted = '0'
+			AND f1.betting_tickets_code NOT IN
+			<foreach collection="codeList" item="c" open="(" separator="," close=")">
+				 #{c.code}
+			</foreach>
+	</select>
+
+	<!-- ワイドの当選リストから選外である発送順テーブル情報一覧を取得する -->
+	<select id="selectShippingOrdersOfNotSelectedAtWide"
+			resultType="com.example.demo.dto.TShippingOrder"
+			parameterType="java.util.List">
+		SELECT
+			f1.id AS id,
+			f1.betting_tickets_code AS bettingTicketsCode,
+			f1.odds AS odds,
+			f1.time_chase AS timeChase,
+			f1.time_chase_sub AS timeChaseSub,
+			f1.present_value AS presentValue,
+			f1.continuous_injustice_max AS continuousInjusticeMax,
+			f1.continuous_injustice_count AS continuousInjusticeCount,
+			f1.created_at AS createdAt,
+			f1.updated_at AS updatedAt,
+			f1.is_deleted AS isDeleted
+		FROM
+			(SELECT *
+				FROM t_shipping_order tso
+				WHERE tso.betting_tickets_code LIKE '3000%' AND tso.is_deleted = '0') f1
+		WHERE
+			f1.is_deleted = '0'
+			AND f1.betting_tickets_code NOT IN
+			<foreach collection="codeList" item="c" open="(" separator="," close=")">
+				 #{c.code}
+			</foreach>
+	</select>
+
+	<!-- 券種コードを条件に発送順テーブルのレコードを更新する -->
+    <update id="updateShippingOrder" parameterType="com.example.demo.dto.TShippingOrder">
+		 UPDATE
+			t_shipping_order tso
+		 SET
+			tso.present_value = #{presentValue}
+		 WHERE
+			tso.betting_tickets_code = #{bettingTicketsCode};
+    </update>
+
+	<!-- 発送順テーブルの複数のレコードを更新する -->
+    <update id="updateBatchShippingOrder" parameterType="java.util.List">
+		 UPDATE
+			t_shipping_order tso
+		 SET
+			tso.present_value = #{presentValue}
+		 WHERE
+			tso.betting_tickets_code = #{bettingTicketsCode};
+    </update>
+
+	<!-- 間隔値テーブルにレコードを登録する -->
+	<insert id="resisterIntervalValue"
+			parameterType="com.example.demo.dto.TIntervalValues"
+			useGeneratedKeys="true"
+			keyProperty="id">
+	    insert into t_interval_values
+	      (tso_id, sort_number, interval_value)
+	    values
+	    (
+	      #{tiv.tsoId,jdbcType=INTEGER},
+	      #{tiv.sortNumber,jdbcType=INTEGER},
+	      #{tiv.intervalValue,jdbcType=INTEGER}
+	    )
+	</insert>
+
+	<!-- 間隔値テーブルのレコードを更新する -->
+	<insert id="updateIntervalValue" parameterType="com.example.demo.dto.TIntervalValues">
+	    update
+	    	t_interval_values t
+	    set
+			t.is_deleted = #{tiv.isDeleted}
+	    WHERE
+			t.id = #{tiv.id};
+	</insert>
+
+	<!-- 間隔値テーブル情報を取得する -->
+    <select	id="selectIntervalValues"
+	    	resultType="com.example.demo.dto.TIntervalValues"
+	    	parameterType="Integer">
+	    SELECT
+			tiv.id AS id,
+			tiv.tso_id AS tsoId ,
+			tiv.sort_number AS sortNumber,
+			tiv.interval_value AS intervalValue,
+			tiv.created_at AS createdAt,
+			tiv.updated_at AS updatedAt,
+			tiv.is_deleted AS isDeleted
+		FROM
+			t_interval_values tiv
+		WHERE
+			tiv.sort_number = (SELECT MAX(sort_number)
+				FROM t_interval_values
+				WHERE tso_id = #{tiv.tsoId} AND is_deleted = '0')
+			AND tso_id = #{tiv.tsoId}
+			AND is_deleted = '0'
+    </select>
+
+	<!-- 間隔値テーブル情報を取得する -->
+    <select	id="selectIntervalValueByPrimaryKey"
+	    	resultType="com.example.demo.dto.TIntervalValues"
+	    	parameterType="Integer">
+	    SELECT
+			tiv.id AS id,
+			tiv.tso_id AS tsoId ,
+			tiv.sort_number AS sortNumber,
+			tiv.interval_value AS intervalValue,
+			tiv.created_at AS createdAt,
+			tiv.updated_at AS updatedAt,
+			tiv.is_deleted AS isDeleted
+		FROM
+			t_interval_values tiv
+		WHERE
+			tiv.id = #{id}
+			AND tiv.is_deleted = '0'
+    </select>
+
+</mapper>

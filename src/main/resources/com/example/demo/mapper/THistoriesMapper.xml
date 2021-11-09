@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.demo.mapper.THistoriesMapper">
+
+	<resultMap id="historiesResultMap" type="com.example.demo.dto.THistories">
+		<result property="raceday" column="raceday" />
+		<result property="rownum" column="rownum" />
+	</resultMap>
+
+	<!-- 作業履歴テーブルにレコードを登録する -->
+	<insert id="insertHistory" parameterType="com.example.demo.dto.THistories">
+	    insert into t_histories
+	      (raceday, rownum, place, no, betting_tickets_kind, betting_tickets_code, command_id, accident_code,
+	       winner, runner_up, third_place, accident, tiv_id, present_value, horse)
+	    values
+	    (
+	      #{th.raceday,jdbcType=VARCHAR},
+	      #{th.rownum,jdbcType=VARCHAR},
+	      #{th.place,jdbcType=VARCHAR},
+	      #{th.no,jdbcType=VARCHAR},
+	      #{th.bettingTicketsKind,jdbcType=VARCHAR},
+	      #{th.bettingTicketsCode,jdbcType=VARCHAR},
+	      #{th.commandId,jdbcType=VARCHAR},
+	      #{th.accidentCode,jdbcType=VARCHAR},
+	      #{th.winner,jdbcType=VARCHAR},
+	      #{th.runnerUp,jdbcType=VARCHAR},
+	      #{th.thirdPlace,jdbcType=VARCHAR},
+	      #{th.accident,jdbcType=VARCHAR},
+	      #{th.tivId,jdbcType=INTEGER},
+	      #{th.presentValue,jdbcType=INTEGER},
+	      #{th.horse,jdbcType=VARCHAR}
+	    )
+	</insert>
+
+	<!-- 作業履歴テーブルを削除フラグを立てて更新する -->
+	<update id="updateHistory" parameterType="com.example.demo.dto.THistories">
+	    UPDATE
+	    	t_histories ths
+	    SET
+			ths.is_deleted = #{th.isDeleted}
+	    WHERE
+	    	ths.id = #{th.id}
+	</update>
+
+	<!-- 作業履歴テーブルのレコードにアクシデント内容を更新する -->
+	<update id="updateHistoryByAccident" parameterType="com.example.demo.dto.THistories">
+	    UPDATE
+	    	t_histories ths
+	    SET
+	    	ths.accident_code = #{th.accidentCode}
+			ths.accident = #{th.accident}
+	    WHERE
+	    	ths.id = #{th.id}
+	</update>
+
+	<!-- 作業履歴テーブルから作業履歴一覧を取得する -->
+    <select id="selectHistories"
+    		resultType="com.example.demo.dto.THistories">
+		SELECT
+			th.id AS id,
+			th.raceday AS raceday,
+			th.rownum AS rownum,
+			th.place AS place,
+			th.no AS no,
+			th.betting_tickets_kind AS bettingTicketsKind,
+			th.betting_tickets_code AS bettingTicketsCode,
+			th.command_id AS commandId,
+			th.accident_code AS accidentCode,
+			th.winner AS winner,
+			th.runner_up AS runnerUp,
+			th.third_place AS thirdPlace,
+			th.accident AS accident,
+			th.tiv_id AS tivId,
+			th.present_value AS presentValue,
+			th.horse AS horse,
+			th.created_at AS createdAt,
+			th.updated_at AS updatedAt,
+			th.is_deleted AS isDeleted
+		FROM
+			t_histories th
+		WHERE
+			th.is_deleted = '0'
+    </select>
+
+	<!-- 作業履歴テーブルから作業履歴一覧を取得する -->
+    <select id="selectHistoriesByRaceday"
+    		resultType="com.example.demo.dto.THistories"
+    		parameterType="string">
+		SELECT
+			th.id AS id,
+			th.raceday AS raceday,
+			th.rownum AS rownum,
+			th.place AS place,
+			th.no AS no,
+			th.betting_tickets_kind AS bettingTicketsKind,
+			th.betting_tickets_code AS bettingTicketsCode,
+			th.command_id AS commandId,
+			th.accident_code AS accidentCode,
+			th.winner AS winner,
+			th.runner_up AS runnerUp,
+			th.third_place AS thirdPlace,
+			th.accident AS accident,
+			th.tiv_id AS tivId,
+			th.present_value AS presentValue,
+			th.horse AS horse,
+			th.created_at AS createdAt,
+			th.updated_at AS updatedAt,
+			th.is_deleted AS isDeleted
+		FROM
+			t_histories th
+		<where>
+			<if test="raceday != '' and raceday != null">
+				th.raceday = #{raceday}
+				AND th.is_deleted = '0'
+			</if>
+		</where>
+		ORDER BY th.no DESC, th.id DESC
+    </select>
+
+	<!-- 作業履歴テーブルから当日とレース番号を条件にレコードを取得する -->
+    <select id="selectHistoriesByRacedayAndRownum"
+    		resultMap="historiesResultMap"
+    		parameterType="com.example.demo.form.dashboard.DashBoardCheckRequestForm">
+		SELECT
+			th.raceday,
+			th.rownum
+		FROM
+			t_histories th
+		<where>
+			<if test="req.raceday != '' and req.raceday != null">
+				th.raceday = #{req.raceday}
+				AND th.rownum = #{req.rownum}
+			</if>
+		</where>
+		GROUP BY
+			th.raceday, th.rownum
+    </select>
+</mapper>

@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.demo.mapper.DashBoardMapper">
+
+	<select id="list" resultType="com.example.demo.dto.PurchaseTargetInfo">
+	<![CDATA[
+SELECT
+	tso.id AS tsoId,
+	tso.betting_tickets_code AS bettingTicketsCode,
+	mbt.name AS bettingTicketsName,
+	tso.present_value AS presentVal,
+	tc.id AS tcId,
+	tc.consecutive_code AS consecutiveCode,
+	mc.name AS consecutiveName,
+	tc.fit_value AS fitVal,
+	tc.second_value AS secondVal,
+	tc.third_value AS thirdVal,
+	tc.max_value AS maxVal,
+	tc.limit_value AS limitVal,
+	v.vmax1_value AS vmax1,
+	v.vmax2_value AS vmax2,
+	v.vmax3_value AS vmax3,
+	tc.updated_at AS updatedAt,
+	tc.is_deleted AS isDeleted
+FROM
+	t_shipping_order tso
+	INNER JOIN t_consecutive tc ON tso.id = tc.tso_id
+	INNER JOIN m_betting_tickets mbt ON tso.betting_tickets_code = mbt.code
+	INNER JOIN m_consecutive mc ON tc.consecutive_code = mc.code
+	INNER JOIN (SELECT
+						vmax1.tso_id AS v_id,
+						vmax1.interval_value AS vmax1_value,
+						vmax2.interval_value AS vmax2_value,
+						vmax3.interval_value AS vmax3_value
+					FROM
+						(SELECT t1.tso_id,t1.interval_value
+						FROM t_interval_values t1
+						INNER JOIN v_max_interval_values_sort_number v1
+						ON t1.tso_id = v1.id AND t1.sort_number = v1.max_sort_number AND t1.is_deleted = '0') AS vmax1,
+						(SELECT t2.tso_id,t2.interval_value
+						FROM t_interval_values t2
+						INNER JOIN v_max_interval_values_sort_number v2
+						ON t2.tso_id = v2.id AND t2.sort_number = v2.max_sort_number-1 AND t2.is_deleted = '0') AS vmax2,
+						(SELECT t3.tso_id,t3.interval_value
+						FROM t_interval_values t3
+						INNER JOIN v_max_interval_values_sort_number v3
+						ON t3.tso_id = v3.id AND t3.sort_number = v3.max_sort_number-2 AND t3.is_deleted = '0') AS vmax3
+					WHERE
+						vmax1.tso_id = vmax2.tso_id
+						AND vmax1.tso_id = vmax3.tso_id
+						AND vmax2.tso_id = vmax3.tso_id) v
+	ON tso.id = v.v_id
+WHERE
+	tc.consecutive_code = '1'
+	AND tso.present_value >= tc.limit_value
+	AND tc.fit_value <= v.vmax1_value
+	AND v.vmax1_value != 99999999
+	AND tc.is_deleted = '0'
+UNION ALL
+SELECT
+	tso.id AS tsoId,
+	tso.betting_tickets_code AS bettingTicketsCode,
+	mbt.name AS bettingTicketsName,
+	tso.present_value AS presentVal,
+	tc.id AS tcId,
+	tc.consecutive_code AS consecutiveCode,
+	mc.name AS consecutiveName,
+	tc.fit_value AS fitVal,
+	tc.second_value AS secondVal,
+	tc.third_value AS thirdVal,
+	tc.max_value AS maxVal,
+	tc.limit_value AS limitVal,
+	v.vmax1_value AS vmax1,
+	v.vmax2_value AS vmax2,
+	v.vmax3_value AS vmax3,
+	tc.updated_at AS updatedAt,
+	tc.is_deleted AS isDeleted
+FROM
+	t_shipping_order tso
+	INNER JOIN t_consecutive tc ON tso.id = tc.tso_id
+	INNER JOIN m_betting_tickets mbt ON tso.betting_tickets_code = mbt.code
+	INNER JOIN m_consecutive mc ON tc.consecutive_code = mc.code
+	INNER JOIN (SELECT
+						vmax1.tso_id AS v_id,
+						vmax1.interval_value AS vmax1_value,
+						vmax2.interval_value AS vmax2_value,
+						vmax3.interval_value AS vmax3_value
+					FROM
+						(SELECT t1.tso_id,t1.interval_value
+						FROM t_interval_values t1
+						INNER JOIN v_max_interval_values_sort_number v1
+						ON t1.tso_id = v1.id AND t1.sort_number = v1.max_sort_number AND t1.is_deleted = '0') AS vmax1,
+						(SELECT t2.tso_id,t2.interval_value
+						FROM t_interval_values t2
+						INNER JOIN v_max_interval_values_sort_number v2
+						ON t2.tso_id = v2.id AND t2.sort_number = v2.max_sort_number-1 AND t2.is_deleted = '0') AS vmax2,
+						(SELECT t3.tso_id,t3.interval_value
+						FROM t_interval_values t3
+						INNER JOIN v_max_interval_values_sort_number v3
+						ON t3.tso_id = v3.id AND t3.sort_number = v3.max_sort_number-2 AND t3.is_deleted = '0') AS vmax3
+					WHERE
+						vmax1.tso_id = vmax2.tso_id
+						AND vmax1.tso_id = vmax3.tso_id
+						AND vmax2.tso_id = vmax3.tso_id) v
+	ON tso.id = v.v_id
+WHERE
+	tc.consecutive_code = '2'
+	AND tso.present_value >= tc.limit_value
+	AND tc.fit_value <= v.vmax1_value
+	AND tc.second_value <= v.vmax2_value
+	AND v.vmax1_value != 99999999
+	AND v.vmax2_value != 99999999
+	AND tc.is_deleted = '0'
+UNION ALL
+SELECT
+	tso.id AS tsoId,
+	tso.betting_tickets_code AS bettingTicketsCode,
+	mbt.name AS bettingTicketsName,
+	tso.present_value AS presentVal,
+	tc.id AS tcId,
+	tc.consecutive_code AS consecutiveCode,
+	mc.name AS consecutiveName,
+	tc.fit_value AS fitVal,
+	tc.second_value AS secondVal,
+	tc.third_value AS thirdVal,
+	tc.max_value AS maxVal,
+	tc.limit_value AS limitVal,
+	v.vmax1_value AS vmax1,
+	v.vmax2_value AS vmax2,
+	v.vmax3_value AS vmax3,
+	tc.updated_at AS updatedAt,
+	tc.is_deleted AS isDeleted
+FROM
+	t_shipping_order tso
+	INNER JOIN t_consecutive tc ON tso.id = tc.tso_id
+	INNER JOIN m_betting_tickets mbt ON tso.betting_tickets_code = mbt.code
+	INNER JOIN m_consecutive mc ON tc.consecutive_code = mc.code
+	INNER JOIN (SELECT
+						vmax1.tso_id AS v_id,
+						vmax1.interval_value AS vmax1_value,
+						vmax2.interval_value AS vmax2_value,
+						vmax3.interval_value AS vmax3_value
+					FROM
+						(SELECT t1.tso_id,t1.interval_value
+						FROM t_interval_values t1
+						INNER JOIN v_max_interval_values_sort_number v1
+						ON t1.tso_id = v1.id AND t1.sort_number = v1.max_sort_number AND t1.is_deleted = '0') AS vmax1,
+						(SELECT t2.tso_id,t2.interval_value
+						FROM t_interval_values t2
+						INNER JOIN v_max_interval_values_sort_number v2
+						ON t2.tso_id = v2.id AND t2.sort_number = v2.max_sort_number-1 AND t2.is_deleted = '0') AS vmax2,
+						(SELECT t3.tso_id,t3.interval_value
+						FROM t_interval_values t3
+						INNER JOIN v_max_interval_values_sort_number v3
+						ON t3.tso_id = v3.id AND t3.sort_number = v3.max_sort_number-2 AND t3.is_deleted = '0') AS vmax3
+					WHERE
+						vmax1.tso_id = vmax2.tso_id
+						AND vmax1.tso_id = vmax3.tso_id
+						AND vmax2.tso_id = vmax3.tso_id) v
+	ON tso.id = v.v_id
+WHERE
+	tc.consecutive_code = '3'
+	AND tso.present_value >= tc.limit_value
+	AND tc.fit_value <= v.vmax1_value
+	AND tc.second_value <= v.vmax2_value
+	AND tc.third_value <= v.vmax3_value
+	AND v.vmax1_value != 99999999
+	AND v.vmax2_value != 99999999
+	AND v.vmax3_value != 99999999
+	AND tc.is_deleted = '0'
+	]]>
+    </select>
+</mapper>

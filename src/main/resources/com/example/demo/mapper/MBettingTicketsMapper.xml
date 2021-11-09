@@ -1,0 +1,215 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.demo.mapper.MBettingTicketsMapper">
+	<!-- DTOプロパティ名とDBのカラム名をマップする -->
+	<!-- userResultMap:マップ名 -->
+	<!-- User:DTO -->
+	<resultMap id="bettingTicketsResultMap" type="com.example.demo.dto.MBettingTickets">
+		<!-- 個々のプロパティ名とDBカラム名を紐づける -->
+		<!-- property：DTOのプロパティ名 -->
+		<!-- column：DBのカラム名 -->
+		<result property="code" column="code" />
+		<result property="name" column="name" />
+		<result property="kind" column="kind" />
+		<result property="p1" column="p1" />
+		<result property="p2" column="p2" />
+		<result property="p3" column="p3" />
+		<result property="createdAt" column="created_at" />
+		<result property="updatedAt" column="updated_at" />
+		<result property="isDeleted" column="is_deleted" />
+	</resultMap>
+
+	<!-- 券種情報検索 -->
+    <select id="searchAll" resultMap="bettingTicketsResultMap">
+		SELECT
+			mbt.code,
+			mbt.name,
+			mbt.kind,
+			mbt.p1,
+			mbt.p2,
+			mbt.p3,
+			mbt.created_at,
+			mbt.updated_at,
+			mbt.is_deleted
+		FROM
+			m_betting_tickets mbt
+		WHERE
+			mbt.is_deleted = '0'
+    </select>
+
+	<!-- 全ての券種情報を検索 -->
+    <select id="search" resultType="com.example.demo.dto.MBettingTickets">
+        SELECT * FROM m_betting_tickets WHERE code = #{code}
+    </select>
+
+	<!-- 当選した単勝の券種情報を検索 -->
+    <select id="selectWin"
+    		resultType="com.example.demo.dto.MBettingTickets"
+    		parameterType="com.example.demo.form.DataViewRequestForm">
+        SELECT
+        	*
+        FROM
+        	m_betting_tickets mbt
+        WHERE
+        	mbt.kind = #{kind}
+        	AND mbt.p1 = #{official.winner}
+        	AND mbt.is_deleted = '0'
+    </select>
+
+	<!-- アクシデントがあった単勝の券種情報を検索 -->
+    <select id="selectWinByAcd"
+    		resultType="com.example.demo.dto.MBettingTickets"
+    		parameterType="com.example.demo.form.DataViewRequestForm">
+        SELECT
+        	*
+        FROM
+        	m_betting_tickets mbt
+        WHERE
+        	mbt.kind = #{kind}
+        	AND mbt.p1 = #{acdPullDownVal}
+        	AND mbt.is_deleted = '0'
+    </select>
+
+	<!-- 種別と人気番号から単勝の券種情報を検索 -->
+    <select id="selectWinByKindAndNo"
+    		resultType="com.example.demo.dto.MBettingTickets"
+    		parameterType="string">
+        SELECT
+        	*
+        FROM
+        	m_betting_tickets mbt
+        WHERE
+        	mbt.kind = #{kind}
+        	AND mbt.p1 = #{no}
+        	AND mbt.is_deleted = '0'
+    </select>
+
+	<!-- 当選した複勝の券種情報一覧を検索 -->
+    <select id="selectShow"
+    		resultType="com.example.demo.dto.MBettingTickets"
+    		parameterType="com.example.demo.form.DataViewRequestForm">
+		SELECT
+			*
+		FROM
+			m_betting_tickets mbt
+		WHERE
+			mbt.kind = #{kind}
+			AND (mbt.p2 IN (#{official.winner},#{official.runnerUp},#{official.thirdPlace}))
+        	AND mbt.is_deleted = '0'
+    </select>
+
+
+	<!-- アクシデントがあった複勝の券種情報一覧を検索 -->
+    <select id="selectShowByAcd"
+    		resultType="com.example.demo.dto.MBettingTickets"
+    		parameterType="com.example.demo.form.DataViewRequestForm">
+		SELECT
+			*
+		FROM
+			m_betting_tickets mbt
+		WHERE
+			mbt.kind = #{kind}
+			AND mbt.p2 = #{acdPullDownVal}
+        	AND mbt.is_deleted = '0'
+    </select>
+
+	<!-- 作業履歴から複勝の券種情報を検索 -->
+    <select id="selectShowByKindAndNo"
+    		resultType="com.example.demo.dto.MBettingTickets"
+    		parameterType="string">
+		SELECT
+			*
+		FROM
+			m_betting_tickets mbt
+		WHERE
+			mbt.kind = #{kind}
+			AND mbt.p2 = #{no}
+        	AND mbt.is_deleted = '0'
+    </select>
+
+	<!-- 種別と着順を条件に当選した複勝の券種情報一覧を検索 -->
+    <select id="selectShowByKindAndOfficial"
+    		resultType="com.example.demo.dto.MBettingTickets"
+    		parameterType="string">
+		SELECT
+			*
+		FROM
+			m_betting_tickets mbt
+		WHERE
+			mbt.kind = #{kind}
+			AND(mbt.p2 IN (#{winner},#{runnerUp},#{thirdPlace}))
+        	AND mbt.is_deleted = '0'
+    </select>
+
+	<!-- 当選したワイドの券種情報一覧を検索 -->
+    <select id="selectWide"
+    		resultType="com.example.demo.dto.MBettingTickets"
+    		parameterType="com.example.demo.form.DataViewRequestForm">
+		SELECT
+			*
+		FROM
+			m_betting_tickets mbt
+		WHERE
+			mbt.is_deleted = '0'
+			AND mbt.kind = #{kind}
+			AND (
+				(mbt.p1 = #{official.winner} AND mbt.p2 = #{official.runnerUp})
+				OR
+				(mbt.p1 = #{official.winner} AND mbt.p2 = #{official.thirdPlace})
+				OR
+				(mbt.p1 = #{official.runnerUp} AND mbt.p2 = #{official.thirdPlace})
+			)
+    </select>
+
+	<!-- プルダウン項目の例外結果の人気番号からワイドの券種情報一覧を検索 -->
+    <select id="selectWideByAcd"
+    		resultType="com.example.demo.dto.MBettingTickets"
+    		parameterType="com.example.demo.form.DataViewRequestForm">
+		SELECT
+			*
+		FROM
+			m_betting_tickets mbt
+		WHERE
+			mbt.is_deleted = '0'
+			AND (
+				(mbt.kind = #{kind} AND mbt.p1 = #{acdPullDownVal})
+				OR (mbt.kind = #{kind} AND mbt.p2 = #{acdPullDownVal})
+			)
+    </select>
+
+	<!-- 作業履歴からワイドの券種情報一覧を検索 -->
+    <select id="selectWideByByKindAndNo"
+    		resultType="com.example.demo.dto.MBettingTickets"
+    		parameterType="string">
+		SELECT
+			*
+		FROM
+			m_betting_tickets mbt
+		WHERE
+			mbt.is_deleted = '0'
+			AND mbt.kind = #{kind}
+			AND (mbt.p1 = #{no} OR mbt.p2 = #{no})
+    </select>
+
+	<!-- 種別と着順を条件に当選したワイドの券種情報一覧を検索 -->
+    <select id="selectWideByKindAndOfficial"
+    		resultType="com.example.demo.dto.MBettingTickets"
+    		parameterType="string">
+		SELECT
+			*
+		FROM
+			m_betting_tickets mbt
+		WHERE
+			mbt.is_deleted = '0'
+			AND mbt.kind = #{kind}
+			AND (
+				(mbt.p1 = #{winner} AND mbt.p2 = #{runnerUp})
+				OR
+				(mbt.p1 = #{winner} AND mbt.p2 = #{thirdPlace})
+				OR
+				(mbt.p1 = #{runnerUp} AND mbt.p2 = #{thirdPlace})
+			)
+    </select>
+</mapper>

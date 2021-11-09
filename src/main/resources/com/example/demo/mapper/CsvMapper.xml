@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.demo.mapper.CsvMapper">
+
+	<!-- レーステーブル情報一覧を取得する -->
+	<select id="selectRacesByDate"
+			resultType="com.example.demo.dto.Race"
+			parameterType="String">
+		SELECT
+			tr.year, tr.month, tr.day
+		FROM
+			t_races tr
+		WHERE
+			tr.year = #{year}
+			AND tr.month = #{month}
+			AND tr.day = #{day}
+		GROUP BY
+			tr.year, tr.month, tr.day
+    </select>
+
+	<!-- レースCSVファイルの中身を登録する -->
+	<insert id="insertBulk" parameterType="java.util.List">
+	    insert into t_races
+	      (year, month, day, place, no, grade, conditions, kind, distance, horse)
+	    values
+	    <foreach collection="raceList" item="rl" separator=",">
+	    (
+	      #{rl.year,jdbcType=VARCHAR},
+	      #{rl.month,jdbcType=VARCHAR},
+	      #{rl.day,jdbcType=VARCHAR},
+	      #{rl.place,jdbcType=VARCHAR},
+	      #{rl.no,jdbcType=VARCHAR},
+	      #{rl.grade,jdbcType=VARCHAR},
+	      #{rl.conditions,jdbcType=VARCHAR},
+	      #{rl.kind,jdbcType=VARCHAR},
+	      #{rl.distance,jdbcType=VARCHAR},
+	      #{rl.horse,jdbcType=VARCHAR}
+	    )
+	    </foreach>
+	</insert>
+</mapper>

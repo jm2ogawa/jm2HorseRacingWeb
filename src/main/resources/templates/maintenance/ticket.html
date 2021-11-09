@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+	<meta charset="utf-8" />
+	<link rel="stylesheet" href="/css/bootstrap.min.css">
+	<link rel="stylesheet" href="/css/datatables.css">
+	<script type="text/javascript" src="/js/jquery-3.6.0.min.js"></script>
+	<script type="text/javascript" src="/js/popper.min.js"></script>
+	<script type="text/javascript" src="/js/bootstrap.min.js"></script>
+	<script type="text/javascript" src="/js/datatables.js"></script>
+	<script type="text/javascript" src="/js/maintenance/ticket.js"></script>
+	<title>メンテナンス</title>
+</head>
+<body>
+	<div class="container">
+    	<h3>券種マスタ管理</h3>
+		<nav aria-label="breadcrumb">
+			<ol class="breadcrumb">
+				<li class="breadcrumb-item"><a href="../menu">Menu</a></li>
+				<li class="breadcrumb-item">Maintenance</li>
+				<li class="breadcrumb-item active" aria-current="page">ticket</li>
+			</ol>
+		</nav>
+
+		<div th:if="${res.message != ''}">
+			<span th:id="id-message" th:text="${res.message}"></span>
+		</div>
+
+		<table class="table table-striped" th:id="id-table">
+    		<thead>
+				<tr>
+					<th>No</th>
+					<th>券種コード</th>
+					<th>名称</th>
+					<th>種別</th>
+					<th>更新日時</th>
+					<th>削除フラグ</th>
+				</tr>
+		    <thead>
+		    <tbody th:id="id-tbody" th:object="${res}">
+				<tr th:each="bt, status : ${res.mbtList}">
+					<td th:text="${status.count}"></td>
+					<td th:text="${bt.code}"></td>
+					<td th:text="${bt.name}"></td>
+					<td th:text="${bt.kind}"></td>
+					<td th:text="${bt.updatedAt}"></td>
+					<td th:text="${bt.isDeleted}"></td>
+				</tr>
+			</tbody>
+		</table>
+    </div>
+</body>
+</html>

@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.demo.mapper.ConfigMapper">
+	<select id="getConfigMap" resultType="java.util.Map" parameterType="string">
+	<![CDATA[
+		SELECT * FROM t_configurations tc WHERE tc.id = #{id}
+	]]>
+    </select>
+
+	<select id="getConfig" resultType="com.example.demo.dto.Config" parameterType="string">
+	<![CDATA[
+		SELECT * FROM t_configurations tc WHERE tc.id = #{id}
+	]]>
+    </select>
+
+    <update id="updateConfig" parameterType="com.example.demo.dto.Config">
+        UPDATE
+        	t_configurations tc
+        SET
+            tc.param = #{param}
+        WHERE
+            tc.id = #{id}
+    </update>
+</mapper>
